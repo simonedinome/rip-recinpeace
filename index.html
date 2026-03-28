@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Focus Tool — audio generativo e timer pomodoro per la concentrazione" />
+  <title>Focus Tool</title>
+  <link rel="manifest" href="/public/manifest.json" />
+  <meta name="theme-color" content="#7c6af7" />
+  <link rel="stylesheet" href="src/style.css" />
+</head>
+<body>
+  <div class="app">
+
+    <!-- HEADER -->
+    <header class="header">
+      <div id="logo" class="logo" title="Focus Tool">◈</div>
+      <div class="header-controls">
+        <div class="master-volume">
+          <label class="sr-only" for="master-vol">Volume</label>
+          <input id="master-vol" type="range" min="0" max="1" step="0.01" value="0.8" class="slider slider--master" />
+        </div>
+        <canvas id="vu-meter" class="vu-meter" width="120" height="20"></canvas>
+        <button id="settings-btn" class="btn-icon" aria-label="Impostazioni">⚙</button>
+      </div>
+    </header>
+
+    <!-- MAIN PLAYER -->
+    <main class="main">
+
+      <!-- TAB NAV -->
+      <nav class="tabs">
+        <button class="tab-btn active" data-tab-btn="frequencies">Frequenze</button>
+        <button class="tab-btn" data-tab-btn="tracks">Tracce</button>
+      </nav>
+
+      <!-- FREQUENCIES TAB -->
+      <section class="tab-panel active" data-tab-panel="frequencies">
+        <div id="frequency-grid" class="frequency-grid"></div>
+      </section>
+
+      <!-- TRACKS TAB -->
+      <section class="tab-panel" data-tab-panel="tracks">
+        <div id="track-list" class="track-list"></div>
+      </section>
+
+    </main>
+
+    <!-- POMODORO -->
+    <aside class="pomodoro-section">
+      <div class="pomodoro-card glass-card">
+        <div class="pomodoro-ring-wrap">
+          <svg class="pomodoro-ring" viewBox="0 0 100 100" width="140" height="140">
+            <circle class="ring-bg" cx="50" cy="50" r="44" />
+            <circle id="ring-progress" class="ring-progress" cx="50" cy="50" r="44" />
+          </svg>
+          <div id="pomodoro-time" class="pomodoro-time">25:00</div>
+          <div id="pomodoro-phase" class="pomodoro-phase">Lavoro</div>
+        </div>
+        <div id="session-dots" class="session-dots"></div>
+        <div class="pomodoro-actions">
+          <button id="pomodoro-btn" class="btn btn--primary">▶ Start</button>
+        </div>
+        <details class="session-log-wrap">
+          <summary class="session-log-toggle">Storico sessioni</summary>
+          <div id="session-log" class="session-log"></div>
+        </details>
+      </div>
+    </aside>
+
+    <!-- SETTINGS PANEL (hidden by default) -->
+    <section id="settings-panel" class="settings-panel glass-card" hidden>
+      <h2 class="settings-title">Impostazioni</h2>
+      <form id="settings-form" class="settings-form">
+
+        <div class="settings-group">
+          <h3 class="settings-group-title">Pomodoro</h3>
+
+          <label class="settings-row">
+            <span>Lavoro (min)</span>
+            <input type="number" name="work" min="1" max="120" class="settings-input" />
+          </label>
+          <label class="settings-row">
+            <span>Pausa corta (min)</span>
+            <input type="number" name="shortBreak" min="1" max="60" class="settings-input" />
+          </label>
+          <label class="settings-row">
+            <span>Pausa lunga (min)</span>
+            <input type="number" name="longBreak" min="1" max="60" class="settings-input" />
+          </label>
+          <label class="settings-row">
+            <span>Sessioni prima della pausa lunga</span>
+            <input type="number" name="sessions" min="1" max="10" class="settings-input" />
+          </label>
+          <label class="settings-row">
+            <span>Auto-start fase successiva</span>
+            <input type="checkbox" name="autoStart" class="settings-checkbox" />
+          </label>
+          <label class="settings-row">
+            <span>Suono notifica</span>
+            <select name="sound" class="settings-select">
+              <option value="none">Nessuno</option>
+              <option value="beep">Beep</option>
+              <option value="bell">Campanella</option>
+              <option value="chime">Carillon</option>
+            </select>
+          </label>
+        </div>
+
+        <div class="settings-actions">
+          <button type="submit" class="btn btn--primary">Salva</button>
+          <button type="button" id="settings-reset" class="btn btn--ghost">Ripristina default</button>
+        </div>
+
+      </form>
+    </section>
+
+    <!-- AUTH MODAL -->
+    <div id="auth-modal" class="auth-modal" hidden>
+      <div class="auth-dialog glass-card">
+        <button id="auth-close" class="btn-icon auth-close" aria-label="Chiudi">✕</button>
+        <h2 class="auth-title">Accesso</h2>
+        <form id="auth-form" class="auth-form" autocomplete="off">
+          <input id="auth-password" type="password" class="auth-input"
+            placeholder="Password" autocomplete="current-password" />
+          <p id="auth-error" class="auth-error" hidden></p>
+          <button type="submit" class="btn btn--primary">Entra</button>
+        </form>
+      </div>
+    </div>
+
+    <!-- SECRET SECTION (hidden until authenticated) -->
+    <section id="secret-section" class="secret-section" hidden>
+      <div class="secret-card glass-card glass-card--secret">
+        <div class="secret-header">
+          <span id="secret-engine-label" class="secret-engine-label">Web Speech</span>
+          <button id="secret-logout" class="btn-icon" aria-label="Logout">⏏</button>
+        </div>
+        <button id="rec-btn" class="btn btn--rec">⏺ REC</button>
+        <div id="live-transcript" class="live-transcript" aria-live="polite" aria-label="Trascrizione live"></div>
+        <div class="secret-actions">
+          <button id="summarize-btn" class="btn btn--primary" disabled>✦ Genera Riassunto</button>
+        </div>
+        <div id="summary-card" class="summary-card" hidden>
+          <h3 class="summary-title">Riassunto</h3>
+          <div id="summary-content" class="summary-content" contenteditable="true"
+            aria-label="Riassunto editabile"></div>
+          <div class="summary-actions">
+            <button id="save-notion-btn" class="btn btn--primary">Salva su Notion</button>
+            <span id="save-feedback" class="save-feedback" hidden></span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </div>
+
+  <script type="module" src="src/app.js"></script>
+</body>
+</html>
