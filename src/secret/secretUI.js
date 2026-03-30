@@ -1,5 +1,6 @@
 import { transcriberFactory } from './transcriberFactory.js';
 import { logout as authLogout } from './auth.js';
+import { setRecordingState } from '../status.js';
 
 let isRecording = false;
 let transcriptChunks = [];
@@ -34,6 +35,7 @@ async function handleRecClick() {
     isRecording = false;
     recBtn.textContent = '⏺ REC';
     recBtn.classList.remove('recording');
+    setRecordingState(false);
     transcriber.stop();
     const hasContent = transcriptChunks.length > 0;
     summarizeBtn.disabled = !hasContent;
@@ -49,12 +51,14 @@ async function handleRecClick() {
     isRecording = true;
     recBtn.textContent = '⏹ Stop';
     recBtn.classList.add('recording');
+    setRecordingState(true);
     try {
       await transcriber.start(onChunk);
     } catch (e) {
       isRecording = false;
       recBtn.textContent = '⏺ REC';
       recBtn.classList.remove('recording');
+      setRecordingState(false);
       showTranscriptError(e.message);
     }
   }
