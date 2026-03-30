@@ -5,6 +5,7 @@ import { initPomodoroTimer, reloadPomodoroSettings } from './components/pomodoro
 import { initAuth } from './secret/auth.js';
 import { initSecretUI } from './secret/secretUI.js';
 import * as audioMixer from './audio/audioMixer.js';
+import { initStatusDot } from './status.js';
 
 // ── SERVICE WORKER ────────────────────────────────────────
 if ('serviceWorker' in navigator) {
@@ -74,6 +75,7 @@ document.addEventListener('DOMContentLoaded', () => {
   initPomodoroTimer();
   initSettingsPanel(reloadPomodoroSettings);
   initAuth(initSecretUI);
+  initStatusDot();
 
   document.addEventListener('visibilitychange', () => {
     if (document.hidden) audioMixer.suspend();
