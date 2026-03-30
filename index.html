@@ -13,14 +13,17 @@
   <div class="app">
 
     <!-- HEADER -->
-    <header class="header">
-      <div id="logo" class="logo" title="Focus Tool">◈</div>
+    <header class="header glass-card">
+      <div class="header-left">
+        <div id="logo" class="logo" title="Focus Tool">◈</div>
+        <div id="system-status" class="status-dot" title="Stato server"></div>
+      </div>
       <div class="header-controls">
         <div class="master-volume">
           <label class="sr-only" for="master-vol">Volume</label>
           <input id="master-vol" type="range" min="0" max="1" step="0.01" value="0.8" class="slider slider--master" />
         </div>
-        <canvas id="vu-meter" class="vu-meter" width="120" height="20"></canvas>
+        <canvas id="vu-meter" class="vu-meter" width="160" height="24"></canvas>
         <button id="settings-btn" class="btn-icon" aria-label="Impostazioni">⚙</button>
       </div>
     </header>
@@ -140,6 +143,7 @@
         <div id="live-transcript" class="live-transcript" aria-live="polite" aria-label="Trascrizione live"></div>
         <div class="secret-actions">
           <button id="summarize-btn" class="btn btn--primary" disabled>✦ Genera Riassunto</button>
+          <button id="copy-all-btn" class="btn btn--ghost" disabled>Copia tutto</button>
         </div>
         <div id="summary-card" class="summary-card" hidden>
           <h3 class="summary-title">Riassunto</h3>
@@ -147,6 +151,7 @@
             aria-label="Riassunto editabile"></div>
           <div class="summary-actions">
             <button id="save-notion-btn" class="btn btn--primary">Salva su Notion</button>
+            <button id="download-btn" class="btn btn--ghost">⬇ Download</button>
             <span id="save-feedback" class="save-feedback" hidden></span>
           </div>
         </div>
